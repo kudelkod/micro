@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+#   Web Server Service
+  api-gateway-webserver:
+    image: nginx:stable-alpine
+    container_name: api-gateway-webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www/html/
+      - ./docker/nginx/:/etc/nginx/conf.d/
+    networks:
+        - api-gateway
+        - book-service_app-shared
+
+  # Application Service
+  api-gateway:
+    container_name: api-gateway
+    image: digitalocean.com/php
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    tty: true
+    ports:
+        - "9000:9000"
+    environment:
+      SERVICE_NAME: api-gateway
+      SERVICE_TAGS: dev
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    networks:
+        - api-gateway
+        - book-service_app-shared
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./../frontend
+      dockerfile: Dockerfile
+#      target: "dev-stage"
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www/html
+    volumes:
+      - ./../frontend:/var/www/html
+      - /usr/src/app/node_modules
+    networks:
+      - api-gateway
+
+networks:
+    api-gateway:
+    book-service_app-shared:
+      external: true

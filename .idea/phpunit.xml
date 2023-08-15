@@ -5,11 +5,10 @@
       <list>
         <option value="$PROJECT_DIR$/api-gateway/tests/Unit" />
         <option value="$PROJECT_DIR$/api-gateway/tests/Feature" />
-        <option value="$PROJECT_DIR$/services/user-service/tests/Unit" />
-        <option value="$PROJECT_DIR$/services/user-service/tests/Feature" />
         <option value="$PROJECT_DIR$/services/template-service/tests/Unit" />
         <option value="$PROJECT_DIR$/services/template-service/tests/Feature" />
-        <option value="$PROJECT_DIR$/services/user-service/tests" />
+        <option value="$PROJECT_DIR$/services/user-service/tests/Unit" />
+        <option value="$PROJECT_DIR$/services/user-service/tests/Feature" />
       </list>
     </option>
   </component>
