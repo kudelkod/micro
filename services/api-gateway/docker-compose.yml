@@ -14,7 +14,7 @@ services:
       - ./docker/nginx/:/etc/nginx/conf.d/
     networks:
         - api-gateway
-        - book-service_app-shared
+        - app-shared
 
   # Application Service
   api-gateway:
@@ -35,24 +35,24 @@ services:
     working_dir: /var/www/html
     networks:
         - api-gateway
-        - book-service_app-shared
+        - app-shared
 
-  frontend:
-    container_name: frontend
-    build:
-      context: ./../frontend
-      dockerfile: Dockerfile
-#      target: "dev-stage"
-    restart: unless-stopped
-    tty: true
-    working_dir: /var/www/html
-    volumes:
-      - ./../frontend:/var/www/html
-      - /usr/src/app/node_modules
-    networks:
-      - api-gateway
+#  frontend:
+#    container_name: frontend
+#    build:
+#      context: ./../frontend
+#      dockerfile: Dockerfile
+##      target: "dev-stage"
+#    restart: unless-stopped
+#    tty: true
+#    working_dir: /var/www/html
+#    volumes:
+#      - ./../frontend:/var/www/html
+#      - /usr/src/app/node_modules
+#    networks:
+#      - api-gateway
 
 networks:
     api-gateway:
-    book-service_app-shared:
-      external: true
+    app-shared:
+      driver: bridge

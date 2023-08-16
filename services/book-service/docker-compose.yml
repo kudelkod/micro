@@ -12,7 +12,7 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     networks:
         - book-service
-        - app-shared
+        - api-gateway_app-shared
 
     # Application Service
   book-service:
@@ -33,9 +33,9 @@ services:
     working_dir: /var/www/html
     networks:
         - book-service
-        - app-shared
+        - api-gateway_app-shared
 
 networks:
     book-service:
-    app-shared:
-      driver: bridge
+    api-gateway_app-shared:
+      external: true
