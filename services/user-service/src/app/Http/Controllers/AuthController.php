@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -20,38 +20,48 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $credentials = $request->only('login', 'password');
+        $data = DB::transaction(function () use ($credentials){
+            $user = User::where('login', $credentials['login'])->first();
 
-        if (!Auth::attempt($credentials)){
-            return response()->json(['error' => 'Invalid login or password'], 200);
-        }
+            if (!$user){
+                return response()->json(['error' => 'Invalid login'], 200);
+            }
+            if (!Hash::check($credentials['password'], $user->password)){
+                return response()->json(['error' => 'Invalid password'], 200);
+            }
 
-        $user = Auth::user();
+            $access_token = $this->createAccess($user);
+            $refresh_token = $this->createRefresh($user);
 
-        $access_token = $this->createAccess($user);
-        $refresh_token = $this->createRefresh($user);
+            $user->update([
+                'refresh_token' => $refresh_token,
+            ]);
 
-        $user->update([
-            'refresh_token' => $refresh_token,
-        ]);
-        return response()->json(['access_token' => $access_token, 'refresh_token' => $refresh_token], 200);
+            return ['access_token' => $access_token, 'refresh_token' => $refresh_token];
+        });
+        return response()->json($data, 200);
     }
 
     public function register(Request $request): JsonResponse
     {
-        $user = User::create([
-            'name' => $request->name,
-            'login' => $request->login,
-            'password' => Hash::make($request->password),
-        ]);
+        $data = DB::transaction(function () use ($request){
+            $user = User::create([
+                'name' => $request->name,
+                'login' => $request->login,
+                'password' => Hash::make($request->password),
+            ]);
 
-        $access_token = $this->createAccess($user);
-        $refresh_token = $this->createRefresh($user);
+            $access_token = $this->createAccess($user);
+            $refresh_token = $this->createRefresh($user);
 
-        $user->update([
-            'refresh_token' => $refresh_token,
-        ]);
+            $user->update([
+                'refresh_token' => $refresh_token,
+            ]);
 
-        return response()->json(['access_token' => $access_token, 'refresh_token' => $refresh_token], 200);
+            return ['access_token' => $access_token, 'refresh_token' => $refresh_token];
+        });
+
+        return response()->json($data, 200);
     }
 
     public function me(Request $request): JsonResponse
@@ -71,7 +81,7 @@ class AuthController extends Controller
             'sub' => $user,
         ];
 
-        return JWT::encode($payload_access, config('jwt.secret'), config('jwt.algorithm'));
+        return JWT::encode($payload_access, env('JWT_SECRET'), env('JWT_ALGORITHM'));
     }
 
     protected function createRefresh($user): string
@@ -83,6 +93,6 @@ class AuthController extends Controller
             'sub' => $user,
         ];
 
-        return JWT::encode($payload_refresh, config('jwt.secret'), config('jwt.algorithm'));
+        return JWT::encode($payload_refresh, env('JWT_SECRET'), env('JWT_ALGORITHM'));
     }
 }

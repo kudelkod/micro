@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Book\BookApiController;
-use App\Http\Controllers\User\UserApiController;
+use app\Http\Controllers\Book\BookApiController;
+use app\Http\Controllers\User\UserApiController;
 use Illuminate\Support\Facades\Route;
 
 /*

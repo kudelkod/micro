@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Book;
+namespace app\Http\Controllers\Book;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Casts\Json;

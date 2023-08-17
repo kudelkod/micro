@@ -15,7 +15,7 @@ function getTokenData($token): stdClass
 {
     return JWT::decode(
         substr($token, 7),
-        new Key(config('jwt.secret'), config('jwt.algorithm'))
+        new Key(env('JWT_SECRET'), env('JWT_ALGORITHM'))
     );
 }
 
