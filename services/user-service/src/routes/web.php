@@ -19,4 +19,5 @@ $router->group(['prefix' => '/auth'], function ($router){
     $router->post('/login', 'AuthController@login');
     $router->get('/me', 'AuthController@me');
     $router->post('/register', 'AuthController@register');
+    $router->get('/mail', 'AuthController@mail');
 });

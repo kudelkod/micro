@@ -9,12 +9,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['login', 'register']]);
+        $this->middleware('auth', ['except' => ['login', 'register', 'mail']]);
     }
 
     public function login(Request $request): JsonResponse
@@ -94,5 +95,12 @@ class AuthController extends Controller
         ];
 
         return JWT::encode($payload_refresh, env('JWT_SECRET'), env('JWT_ALGORITHM'));
+    }
+
+    public function mail(){
+        $data = array('name'=>'DC');
+        Mail::send('mail', $data, function($message) {
+            $message->to('cddc76855@gmail.com')->subject('Test Mail from Dima');
+        });
     }
 }

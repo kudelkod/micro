@@ -1,41 +1,30 @@
 version: '3.8'
 
 services:
-#   Web Server Service
-  book-service-webserver:
-    image: nginx:stable-alpine
-    container_name: book-service-webserver
-    ports:
-      - "8081:80"
-    volumes:
-      - ./src:/var/www/html
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-    networks:
-        - book-service
-        - api-gateway_app-shared
-
-    # Application Service
   book-service:
     container_name: book-service
-    image: digitalocean.com/php
     build:
-      context: ./src
+      context: .
       dockerfile: Dockerfile
-    restart: unless-stopped
-    tty: true
+    env_file:
+      - .env
     ports:
-      - "9001:9000"
-    environment:
-      SERVICE_NAME: book-service
-      SERVICE_TAGS: dev
+      - "8085:3000"
     volumes:
-      - ./src:/var/www/html
-    working_dir: /var/www/html
-    networks:
-        - book-service
-        - api-gateway_app-shared
+      - .:/var/www/html
+    command: go run main.go -b 0.0.0.0
 
-networks:
-    book-service:
-    api-gateway_app-shared:
-      external: true
+  book-service-db:
+    container_name: book-service-db
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+volumes:
+  postgres-db:
