@@ -16,8 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('login')->unique();
             $table->string('email')->unique();
+            $table->boolean('is_email_verified')->default(false);
             $table->string('password');
-            $table->string('refresh_token')->nullable();
+            $table->text('refresh_token')->nullable();
             $table->timestamps();
         });
     }
