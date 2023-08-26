@@ -1,7 +1,7 @@
 <?php
 
-use app\Http\Controllers\Book\BookApiController;
-use app\Http\Controllers\User\UserApiController;
+use App\Http\Controllers\Book\BookApiController;
+use App\Http\Controllers\User\UserApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['prefix' => '/user'], function ($route){
-    $route->get('/', [UserApiController::class, 'index']);
+    $route->post('/register', [UserApiController::class, 'register']);
+    $route->get('/verify_email/{token}', [UserApiController::class, 'verifyEmail']);
 });
 Route::group(['prefix' => '/book'], function ($route){
     $route->get('/', [BookApiController::class, 'index']);

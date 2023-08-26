@@ -61,6 +61,7 @@ $app->singleton(
 
 $app->configure('app');
 $app->configure('mail');
+$app->configure('queue');
 
 /*
 |--------------------------------------------------------------------------
@@ -96,6 +97,7 @@ $app->configure('mail');
  $app->register(\Illuminate\Mail\MailServiceProvider::class);
  $app->register(App\Providers\AuthServiceProvider::class);
  $app->register(App\Providers\UserServiceProvider::class);
+ $app->register(VladimirYuldashev\LaravelQueueRabbitMQ\LaravelQueueRabbitMQServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

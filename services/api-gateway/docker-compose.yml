@@ -37,20 +37,20 @@ services:
         - api-gateway
         - app-shared
 
-#  frontend:
-#    container_name: frontend
-#    build:
-#      context: ./../frontend
-#      dockerfile: Dockerfile
-##      target: "dev-stage"
-#    restart: unless-stopped
-#    tty: true
-#    working_dir: /var/www/html
-#    volumes:
-#      - ./../frontend:/var/www/html
-#      - /usr/src/app/node_modules
-#    networks:
-#      - api-gateway
+  frontend:
+    container_name: frontend
+    build:
+      context: ./../frontend
+      dockerfile: Dockerfile
+#      target: "dev-stage"
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www/html
+    volumes:
+      - ./../frontend:/var/www/html
+      - /usr/src/app/node_modules
+    networks:
+      - api-gateway
 
 networks:
     api-gateway:

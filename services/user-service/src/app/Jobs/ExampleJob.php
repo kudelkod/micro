@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use Illuminate\Support\Facades\Mail;
+
 class ExampleJob extends Job
 {
     /**
@@ -21,6 +23,9 @@ class ExampleJob extends Job
      */
     public function handle()
     {
-        //
+        Mail::send('mail', ['token' => '123', 'name' => 'DC'], function($message) {
+            $message->to('cddc76855@gmail.com')
+                ->subject('Email verification!');
+        });
     }
 }

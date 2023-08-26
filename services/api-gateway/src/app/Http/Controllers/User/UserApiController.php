@@ -1,12 +1,13 @@
 <?php
 
-namespace app\Http\Controllers\User;
+namespace App\Http\Controllers\User;
 
-use app\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class UserApiController extends Controller
 {
@@ -17,14 +18,29 @@ class UserApiController extends Controller
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      * @throws GuzzleException
      */
-    public function index(): JsonResponse
+    public function register(Request $request): JsonResponse
     {
-        $response = $this->client->get('http://user-service-webserver/api')->getBody()->getContents();
-        $data = Json::decode($response);
+        $data = $request->input();
 
-        return response()->json(['data' => $data]);
+        $response = $this->client->post('http://user-service-webserver/api/auth/register', [
+            'form_params' => $data
+        ])
+            ->getBody()
+            ->getContents();
+
+        $response = Json::decode($response);
+
+        return response()->json($response);
+    }
+
+    public function verifyEmail($token)
+    {
+        return $this->client->get('http://user-service-webserver/api/email/verify/'.$token)
+            ->getBody()
+            ->getContents();
     }
 }

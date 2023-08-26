@@ -17,7 +17,6 @@ services:
     # Application Service
   user-service:
     container_name: user-service
-    image: digitalocean.com/php
     build:
       context: ./src
       dockerfile: Dockerfile
@@ -35,7 +34,7 @@ services:
       - user-service
       - api-gateway_app-shared
 
-  db:
+  user-service-db:
     image: mysql:latest
     container_name: user-service-db
     restart: unless-stopped
@@ -52,6 +51,31 @@ services:
 #      - ./mysql/my.cnf:/etc/mysql/my.cnf
     networks:
       - user-service
+
+  user-service-rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: user-service-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASSWORD: guest
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - user-service
+
+  user-service-supervisor:
+    build:
+      context: ./src
+      dockerfile: Dockerfile.supervisor
+    container_name: user-service-supervisor
+    volumes:
+      - ./src:/var/www/html
+    networks:
+      - user-service
+
 
 networks:
   user-service:

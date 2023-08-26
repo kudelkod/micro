@@ -2,16 +2,16 @@
 
 namespace App\Services\EmailVerification;
 
+use App\Jobs\MailJob;
 use App\Repositories\EmailVerification\impl\UserEmailVerifyRepositoryInterface;
 use App\Services\EmailVerification\impl\UserEmailVerifyServiceInterface;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class UserEmailVerifyService implements UserEmailVerifyServiceInterface
 {
     private UserEmailVerifyRepositoryInterface $userEmailVerifyRepository;
-    public function __construct(UserEmailVerifyRepositoryInterface $userEmailVerifyRepository, Mail $mail)
+    public function __construct(UserEmailVerifyRepositoryInterface $userEmailVerifyRepository)
     {
         $this->userEmailVerifyRepository = $userEmailVerifyRepository;
     }
@@ -19,11 +19,11 @@ class UserEmailVerifyService implements UserEmailVerifyServiceInterface
     {
         return DB::transaction(function () use ($user){
             $token = Str::random(64);
-            $this->userEmailVerifyRepository->createEmailVerifyToken($user->id, $token);
-            return Mail::send('mail', ['token' => $token, 'name' => $user->name], function($message) use($user) {
-                $message->to($user->email)
-                        ->subject('Email verification!');
-            });
+            if ($this->userEmailVerifyRepository->createEmailVerifyToken($user->id, $token)){
+                dispatch(new MailJob($user, $token))->onQueue('mail');
+                return true;
+            }
+            return false;
         });
     }
 
