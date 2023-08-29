@@ -13,9 +13,9 @@ export const useAuthStore = defineStore('auth', {
     },
     registrationData: {
       name: null,
-      login: null,
       email: null,
       password: null,
+      confirmPassword: null,
     },
   }),
 
@@ -44,13 +44,14 @@ export const useAuthStore = defineStore('auth', {
 
     async register(){
       try{
-        const response = await axios.post(
-            "http://api-gateway.local/api/auth/register",
-            this.registrationData
-        );
-        const data = response.data
-        await router.push({name: 'SignIn'})
-        toast.success(data.message)
+        toast.success('register')
+        // const response = await axios.post(
+        //     "http://api-gateway.local/api/auth/register",
+        //     this.registrationData
+        // );
+        // const data = response.data
+        // await router.push({name: 'SignIn'})
+        // toast.success(data.message)
       }
       catch (e) {
         toast.error(e.message)
