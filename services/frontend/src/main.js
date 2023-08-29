@@ -9,6 +9,8 @@ import router from './router'
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 
+// window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+
 const app = createApp(App)
 
 app.use(createPinia())

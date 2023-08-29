@@ -5,28 +5,24 @@ services:
   api-gateway-webserver:
     image: nginx:stable-alpine
     container_name: api-gateway-webserver
-    restart: unless-stopped
-    tty: true
     ports:
       - "80:80"
     volumes:
-      - ./src:/var/www/html/
+      - ./src:/var/www/html
       - ./docker/nginx/:/etc/nginx/conf.d/
     networks:
-        - api-gateway
-        - app-shared
+      - api-gateway
 
-  # Application Service
+    # Application Service
   api-gateway:
     container_name: api-gateway
-    image: digitalocean.com/php
     build:
       context: ./src
       dockerfile: Dockerfile
     restart: unless-stopped
     tty: true
     ports:
-        - "9000:9000"
+      - "9000:9000"
     environment:
       SERVICE_NAME: api-gateway
       SERVICE_TAGS: dev
@@ -34,8 +30,49 @@ services:
       - ./src:/var/www/html
     working_dir: /var/www/html
     networks:
-        - api-gateway
-        - app-shared
+      - api-gateway
+
+  api-gateway-db:
+    image: mysql:latest
+    container_name: api-gateway-db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql/
+    #      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - api-gateway
+
+  api-gateway-rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: api-gateway-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASSWORD: guest
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - api-gateway
+
+  api-gateway-supervisor:
+    build:
+      context: ./src
+      dockerfile: Dockerfile.supervisor
+    container_name: api-gateway-supervisor
+    volumes:
+      - ./src:/var/www/html
+    networks:
+      - api-gateway
 
   frontend:
     container_name: frontend
@@ -53,6 +90,10 @@ services:
       - api-gateway
 
 networks:
-    api-gateway:
-    app-shared:
-      driver: bridge
+  api-gateway:
+  app-shared:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local

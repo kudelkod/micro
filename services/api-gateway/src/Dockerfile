@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:8.0.2-fpm
 
 RUN apt-get update && apt-get install -y \
         libfreetype6-dev \
@@ -10,8 +10,10 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd
 
+RUN docker-php-ext-install pdo_mysql sockets
+
 # Set working directory
-WORKDIR /var/www/html
+WORKDIR /var/www/api-gateway
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -24,10 +26,10 @@ RUN groupadd -g 1000 www
 RUN useradd -u 1000 -ms /bin/bash -g www www
 
 # Copy existing application directory contents
-COPY .. /var/www/html
+COPY . /var/www/api-gateway
 
 # Copy existing application directory permissions
-COPY --chown=www:www .. /var/www/html
+COPY --chown=www:www . /var/www/api-gateway
 
 # Change current user to www
 USER www
